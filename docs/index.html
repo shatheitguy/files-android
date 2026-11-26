@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Files for Android</title>
+<meta name="description" content="An iPhone-style file manager for Android that works hand in hand with Photos.">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+:root{
+  --bg:#000;--bg2:#0d0d0f;--card:#1c1c1e;--card2:#2c2c2e;--label:#fff;--secondary:#8d8d93;
+  --sep:rgba(84,84,88,.6);--accent:#ffffff;--glass:rgba(42,42,45,.88);--glass-border:rgba(255,255,255,.15);
+  --radius:22px;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#fff;--bg2:#f2f2f7;--card:#fff;--card2:#e9e9ec;--label:#000;--secondary:#8a8a8e;
+    --sep:rgba(60,60,67,.3);--accent:#000000;--glass:rgba(255,255,255,.92);--glass-border:rgba(0,0,0,.08);
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--label);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5}
+a{color:var(--accent);text-decoration:none}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+
+/* nav */
+nav{position:sticky;top:0;z-index:10;backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);background:color-mix(in srgb,var(--bg) 78%,transparent);border-bottom:.5px solid var(--sep)}
+nav .wrap{display:flex;align-items:center;gap:12px;height:56px}
+nav .brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:17px;color:var(--label)}
+nav .brand img{width:28px;height:28px;border-radius:7px}
+nav .links{margin-left:auto;display:flex;gap:22px;font-size:15px}
+nav .links a{color:var(--secondary)}
+nav .links a:hover{color:var(--label)}
+
+/* hero */
+.hero{text-align:center;padding:84px 0 40px}
+.hero .icon{width:112px;height:112px;border-radius:26px;box-shadow:0 20px 60px rgba(255,94,126,.35)}
+.hero h1{font-size:clamp(44px,8vw,80px);font-weight:700;letter-spacing:-.03em;margin-top:26px;line-height:1.05}
+.hero p{font-size:clamp(18px,2.4vw,22px);color:var(--secondary);max-width:640px;margin:16px auto 0}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:32px}
+.btn{display:inline-flex;align-items:center;gap:8px;height:50px;padding:0 26px;border-radius:999px;font-size:17px;font-weight:600}
+.btn.primary{background:linear-gradient(120deg,#ff9a4d,#ff5e7e 50%,#8a5cff);color:#fff}
+.btn.glass{background:var(--glass);color:var(--label);border:.5px solid var(--glass-border)}
+.btn:hover{filter:brightness(1.08)}
+.meta{margin-top:14px;font-size:13px;color:var(--secondary)}
+
+/* phones */
+.phones{display:flex;justify-content:center;gap:28px;padding:40px 0 30px;overflow-x:auto;scrollbar-width:none}
+.phones::-webkit-scrollbar{display:none}
+.phone{flex:0 0 auto;width:250px;height:520px;border-radius:44px;background:#000;border:10px solid #1d1d20;box-shadow:0 30px 80px rgba(0,0,0,.45),0 0 0 1px #3a3a3e;position:relative;overflow:hidden;color:#fff}
+.phone.mid{transform:translateY(-24px)}
+.island{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:78px;height:22px;border-radius:12px;background:#000;z-index:5}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px}
+.grid i{display:block;aspect-ratio:1}
+.lib-head{position:absolute;top:0;left:0;right:0;padding:40px 14px 30px;background:linear-gradient(#000e,#0006 60%,transparent);display:flex;align-items:center;gap:7px;z-index:3}
+.lib-head b{font-size:24px;letter-spacing:-.02em;line-height:1}
+.lib-head small{display:block;font-size:11px;font-weight:600;margin-top:3px}
+.gc{width:32px;height:32px;border-radius:50%;background:rgba(44,44,46,.85);border:.5px solid rgba(255,255,255,.2);display:grid;place-items:center}
+.gp{height:32px;padding:0 13px;border-radius:16px;background:rgba(44,44,46,.85);border:.5px solid rgba(255,255,255,.2);display:grid;place-items:center;font-size:12px}
+.tabbar{position:absolute;bottom:12px;left:12px;right:12px;display:flex;align-items:center;z-index:3}
+.tabcap{display:flex;padding:3px;border-radius:30px;background:rgba(42,42,45,.92);border:.5px solid rgba(255,255,255,.15)}
+.tab{width:62px;padding:5px 0;border-radius:24px;text-align:center;font-size:9px;font-weight:500}
+.tab.on{background:#111113;color:#fff}
+.tab svg{display:block;margin:0 auto 1px}
+.searchbtn{margin-left:auto;width:44px;height:44px;border-radius:50%;background:rgba(42,42,45,.92);border:.5px solid rgba(255,255,255,.15);display:grid;place-items:center}
+.viewer-photo{position:absolute;top:120px;left:0;right:0;height:230px}
+.v-top{position:absolute;top:38px;left:12px;right:12px;display:flex;align-items:center;z-index:3}
+.v-top .t{flex:1;text-align:center;font-size:12px;font-weight:600;line-height:1.2}
+.v-top .t span{display:block;font-weight:400;font-size:10px;color:#8d8d93}
+.strip{position:absolute;bottom:66px;left:0;right:0;display:flex;justify-content:center;gap:1.5px;align-items:center}
+.strip i{display:block;width:16px;height:22px;border-radius:2px}
+.strip i.on{width:22px;height:26px}
+.v-bar{position:absolute;bottom:14px;left:12px;right:12px;display:flex;align-items:center;justify-content:space-between}
+.v-cap{display:flex;gap:14px;padding:0 14px;height:38px;align-items:center;border-radius:20px;background:rgba(42,42,45,.92);border:.5px solid rgba(255,255,255,.15)}
+.alb{padding:40px 14px 0}
+.alb h4{font-size:24px;letter-spacing:-.02em}
+.alb .sec{display:flex;justify-content:space-between;align-items:baseline;margin:12px 0 6px;font-size:14px;font-weight:700}
+.alb .sec a{font-size:12px;font-weight:400}
+.mem{height:150px;border-radius:14px;position:relative;overflow:hidden}
+.mem div{position:absolute;left:12px;bottom:10px}
+.mem b{display:block;font-size:17px}
+.mem small{font-size:8px;letter-spacing:.1em;opacity:.85}
+.albrow{display:flex;gap:8px}
+.albrow div{flex:1}
+.albrow i{display:block;aspect-ratio:1;border-radius:6px}
+.albrow p{font-size:9px;margin-top:3px}
+.albrow p span{display:block;color:#8d8d93}
+.list{margin-top:8px;font-size:11px;color:#fff}
+.list div{display:flex;justify-content:space-between;padding:6px 0;border-bottom:.5px solid rgba(84,84,88,.6)}
+.list div span{color:#8d8d93}
+
+/* features */
+section{padding:70px 0}
+.eyebrow{background:linear-gradient(90deg,#ffb443,#ff5e7e,#8a5cff);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:600;font-size:15px;text-align:center}
+h2{font-size:clamp(32px,5vw,48px);font-weight:700;letter-spacing:-.025em;text-align:center;line-height:1.1;margin-top:6px}
+.lead{color:var(--secondary);font-size:19px;text-align:center;max-width:620px;margin:14px auto 0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px;margin-top:44px}
+.card{background:var(--bg2);border-radius:var(--radius);padding:26px}
+.card .ic{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;margin-bottom:16px}
+.card h3{font-size:21px;letter-spacing:-.01em}
+.card p{color:var(--secondary);margin-top:6px;font-size:16px}
+.card ul{margin-top:10px;padding-left:18px;color:var(--secondary);font-size:15px}
+.card li{margin:3px 0}
+
+/* privacy */
+.privacy{background:var(--bg2);border-radius:28px;padding:48px 28px;text-align:center}
+.pills{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:26px}
+.pill{background:var(--card);border-radius:999px;padding:10px 18px;font-size:15px;font-weight:500}
+
+/* install */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:16px;margin-top:40px}
+.step{background:var(--bg2);border-radius:var(--radius);padding:24px}
+.step .n{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#ffb443,#ff5e7e,#8a5cff);color:#fff;display:grid;place-items:center;font-weight:700;margin-bottom:14px}
+.step h3{font-size:18px}
+.step p{color:var(--secondary);font-size:15px;margin-top:4px}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9em;background:var(--card);padding:2px 6px;border-radius:6px}
+footer{border-top:.5px solid var(--sep);padding:30px 0 50px;color:var(--secondary);font-size:13px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
+@media (max-width:640px){
+  nav .links{gap:16px;font-size:14px}
+  nav .links .hide-sm{display:none}
+  .phones{justify-content:flex-start;padding-left:20px;padding-right:20px}
+  .phone.mid{transform:none}
+  section{padding:54px 0}
+}
+
+/* Files mockups */
+.fhead{padding:40px 14px 6px}
+.fhead h4{font-size:24px;letter-spacing:-.02em}
+.fsearch{margin:8px 0 4px;height:26px;border-radius:8px;background:#1c1c1e;color:#8d8d93;font-size:10px;display:flex;align-items:center;padding:0 8px;gap:5px}
+.fsec{display:flex;justify-content:space-between;align-items:center;margin:12px 0 6px;font-size:13px;font-weight:700}
+.fcard{background:#1c1c1e;border-radius:10px;font-size:11px}
+.fcard div{display:flex;align-items:center;gap:9px;padding:8px 10px;border-bottom:.5px solid rgba(84,84,88,.6)}
+.fcard div:last-child{border-bottom:0}
+.fcard div span{margin-left:auto;color:#8d8d93}
+.dot{width:9px;height:9px;border-radius:50%}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 8px;padding:6px 12px}
+.fgrid div{text-align:center;font-size:8.5px;line-height:1.25}
+.fgrid div small{display:block;color:#8d8d93;font-size:7.5px}
+.folder{width:52px;height:42px;margin:0 auto 5px;position:relative}
+.folder:before{content:"";position:absolute;left:2px;top:2px;width:22px;height:10px;border-radius:3px 3px 0 0;background:#5ab6f5}
+.folder:after{content:"";position:absolute;left:2px;right:2px;top:7px;bottom:2px;border-radius:5px;background:linear-gradient(#8fd3fe,#7cc8fb)}
+.doc{width:34px;height:42px;margin:0 auto 5px;border-radius:3px;background:#2c2c2e;border:1px solid #48484a;display:grid;place-items:end center;font-size:7px;font-weight:800;padding-bottom:4px}
+.thumb{width:48px;height:36px;margin:3px auto 8px;border-radius:4px}
+.sheet{position:absolute;left:0;right:0;bottom:0;top:70px;border-radius:16px 16px 0 0;background:#1c1c1e;padding:14px 12px}
+.sheet h5{font-size:15px;margin-bottom:2px}
+.sheet p{font-size:9px;color:#8d8d93;margin-bottom:10px}
+.field{background:#000;border-radius:7px;padding:7px 8px;font-size:10px;color:#8d8d93;margin-bottom:7px}
+.go{margin-top:10px;height:34px;border-radius:17px;background:linear-gradient(120deg,#ff9a4d,#ff5e7e 50%,#8a5cff);display:grid;place-items:center;font-size:12px;font-weight:600}
+.pillbar{position:absolute;top:36px;left:50%;transform:translateX(-50%);white-space:nowrap;background:rgba(42,42,45,.95);border:.5px solid rgba(255,255,255,.15);border-radius:20px;padding:6px 12px;font-size:9.5px;display:flex;align-items:center;gap:6px;z-index:4}
+.ok{width:13px;height:13px;border-radius:50%;background:#34c759;display:grid;place-items:center;font-size:8px}
+</style>
+</head>
+<body>
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#"><img src="icon.svg" alt="">Files</a>
+    <div class="links">
+      <a href="#features">Features</a>
+      <a class="hide-sm" href="#photos">Photos</a>
+      <a href="#install">Install</a>
+      <a href="https://github.com/shatheitguy/files-android">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <img class="icon" src="icon.svg" alt="Files app icon">
+  <h1>Files.<br>Now on Android.</h1>
+  <p>Browse every folder, USB drive and network share on your phone — with the calm, familiar feel of the iPhone Files app.</p>
+  <div class="cta">
+    <a class="btn primary" href="https://github.com/shatheitguy/files-android/releases/latest">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 20h14"/></svg>
+      Download APK
+    </a>
+    <a class="btn glass" href="https://github.com/shatheitguy/files-android">View source</a>
+  </div>
+  <div class="meta">Free · Android 10 or newer · About 10 MB</div>
+</header>
+
+<div class="phones" aria-hidden="true">
+  <div class="phone">
+    <div class="island"></div>
+    <div class="fhead">
+      <h4>Browse</h4>
+      <div class="fsearch"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8d8d93" stroke-width="2.4"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.3 15.3 5.2 5.2"/></svg>Search</div>
+      <div class="fsec">Locations <span>⌄</span></div>
+      <div class="fcard"><div>📱 On My Phone<span>41 GB free</span></div><div>💾 USB Drive<span>12 GB free</span></div><div>🗑 Recently Deleted</div></div>
+      <div class="fsec">Shared <span>⌄</span></div>
+      <div class="fcard"><div>🖥 192.168.1.10/Media<span>Guest</span></div></div>
+      <div class="fsec">Tags <span>⌄</span></div>
+      <div class="fcard"><div><i class="dot" style="background:#ff3b30"></i>Red</div><div><i class="dot" style="background:#ff9500"></i>Orange</div></div>
+    </div>
+    <div class="tabbar" style="justify-content:center">
+      <div class="tabcap">
+        <div class="tab"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.8"/><path d="M12 7v5l3.5 2"/></svg>Recents</div>
+        <div class="tab on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v11a1.8 1.8 0 0 0 1.8 1.8h14.4A1.8 1.8 0 0 0 21 18V9.2a1.8 1.8 0 0 0-1.8-1.8h-7.7L9.6 5H4.8A1.8 1.8 0 0 0 3 6.8"/></svg>Browse</div>
+      </div>
+      <div class="searchbtn" style="position:absolute;right:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.3 15.3 5.2 5.2"/></svg></div>
+    </div>
+  </div>
+
+  <div class="phone mid">
+    <div class="island"></div>
+    <div class="pillbar"><span class="ok">✓</span>Moved 3 items to “Documents”</div>
+    <div class="fhead" style="padding-top:70px"><h4>Download</h4></div>
+    <div class="fgrid">
+      <div><div class="folder"></div>Invoices<small>12 items</small></div>
+      <div><div class="folder"></div>Music<small>48 items</small></div>
+      <div><div class="doc" style="color:#e5453b">PDF</div>Contract.pdf<small>2.1 MB</small></div>
+      <div><div class="thumb" style="background:linear-gradient(135deg,#ffb443,#ff5e7e)"></div>Beach.jpg<small>3.4 MB</small></div>
+      <div><div class="doc" style="color:#2fa84f">XLSX</div>Budget.xlsx<small>88 KB</small></div>
+      <div><div class="doc" style="color:#8e8e93">ZIP</div>Photos.zip<small>120 MB</small></div>
+      <div><div class="thumb" style="background:linear-gradient(135deg,#4facfe,#8a5cff)"></div>Clip.mp4<small>20 MB</small></div>
+      <div><div class="doc" style="color:#2f7bf5">DOCX</div>Notes.docx<small>34 KB</small></div>
+      <div><div class="folder"></div>Scans<small>5 items</small></div>
+    </div>
+    <div class="tabbar" style="justify-content:center">
+      <div class="tabcap">
+        <div class="tab"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.8"/><path d="M12 7v5l3.5 2"/></svg>Recents</div>
+        <div class="tab on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v11a1.8 1.8 0 0 0 1.8 1.8h14.4A1.8 1.8 0 0 0 21 18V9.2a1.8 1.8 0 0 0-1.8-1.8h-7.7L9.6 5H4.8A1.8 1.8 0 0 0 3 6.8"/></svg>Browse</div>
+      </div>
+      <div class="searchbtn" style="position:absolute;right:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.3 15.3 5.2 5.2"/></svg></div>
+    </div>
+  </div>
+
+  <div class="phone">
+    <div class="island"></div>
+    <div class="fhead"><h4>Browse</h4></div>
+    <div class="sheet">
+      <h5>Connect to Server</h5>
+      <p>Windows PC, Mac or NAS on your Wi-Fi</p>
+      <div class="field">smb://192.168.1.10/Media</div>
+      <div class="field">Name</div>
+      <div class="field">••••••••</div>
+      <div class="go">Connect</div>
+    </div>
+  </div>
+</div>
+
+<section id="features" class="wrap">
+  <div class="eyebrow">Features</div>
+  <h2>Every file, beautifully organized.</h2>
+  <p class="lead">Designed to feel instantly familiar, built natively for Android.</p>
+  <div class="cards">
+    <div class="card">
+      <h3>Browse, Recents and Search</h3>
+      <p>The floating tab bar you can slide your finger across.</p>
+      <ul><li>On My Phone, SD card and USB drives (shown when plugged in)</li><li>Collapsible Locations, Favorites and Tags</li><li>Icons or List, sort by Name, Kind, Date or Size</li><li>Aspect-ratio thumbnails for photos, videos, PDFs and apps</li></ul>
+    </div>
+    <div class="card">
+      <h3>Organize anything</h3>
+      <p>Long-press for the menu you expect.</p>
+      <ul><li>Swipe across files to select many at once</li><li>Rename, Duplicate, Copy, Move — with live progress</li><li>Compress and uncompress ZIP files</li><li>Recently Deleted keeps files for 30 days</li></ul>
+    </div>
+    <div class="card">
+      <h3>Connect to Server &amp; Scan</h3>
+      <p>From the ••• menu on Browse, just like iPhone.</p>
+      <ul><li>SMB shares on your PC, Mac or NAS</li><li>Open, download, upload, new folder, delete</li><li>Scan paper documents straight to PDF</li></ul>
+    </div>
+    <div class="card">
+      <h3>Updates built in</h3>
+      <p>Files tells you when a new version is out.</p>
+      <ul><li>Download with a live progress ring</li><li>Install straight from the app</li></ul>
+    </div>
+  </div>
+</section>
+
+<section id="photos" class="wrap">
+  <div class="privacy">
+    <div class="eyebrow">Works with Photos</div>
+    <h2>Two apps that feel like one.</h2>
+    <p class="lead">Open a picture in Files and it opens in Photos, so you can swipe through the whole folder. “Save to Files” appears in every share sheet, and moves or deletes show up in Photos instantly.</p>
+    <div class="cta"><a class="btn glass" href="https://shatheitguy.github.io/photos-android/">Get Photos</a></div>
+  </div>
+</section>
+
+<section id="install" class="wrap">
+  <div class="eyebrow">Install</div>
+  <h2>Up and running in a minute.</h2>
+  <div class="steps">
+    <div class="step"><div class="n">1</div><h3>Download</h3><p>Get <code>Files.apk</code> from the <a href="https://github.com/shatheitguy/files-android/releases/latest">latest release</a>.</p></div>
+    <div class="step"><div class="n">2</div><h3>Install</h3><p>Open the file on your phone. If Android asks, allow installing from this source.</p></div>
+    <div class="step"><div class="n">3</div><h3>Allow access</h3><p>Open Files, tap <b>Continue</b> and turn on <b>Allow access to manage all files</b>.</p></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Files for Android · Built with Kotlin and Jetpack Compose</span>
+    <span>Independent project, not affiliated with Apple or Google.</span>
+  </div>
+</footer>
+</body>
+</html>
