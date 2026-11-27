@@ -213,9 +213,24 @@ private val FolderTop = Color(0xFF8FD3FE)
 private val FolderBack = Color(0xFF5AB6F5)
 private val FolderFront = Color(0xFF7CC8FB)
 
-/** iOS-style blue folder, drawn in code. */
+/** The folder colours: the phone's accent colour (Material You) on Android 12+, iOS blue before that. */
+@Composable
+private fun folderColors(): Triple<Color, Color, Color> {
+    if (android.os.Build.VERSION.SDK_INT < 31) return Triple(FolderTop, FolderBack, FolderFront)
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    return remember(ctx) {
+        Triple(
+            Color(ctx.getColor(android.R.color.system_accent1_200)),
+            Color(ctx.getColor(android.R.color.system_accent1_400)),
+            Color(ctx.getColor(android.R.color.system_accent1_300)),
+        )
+    }
+}
+
+/** iOS-style folder in the system accent colour, drawn in code. */
 @Composable
 fun FolderIcon(modifier: Modifier) {
+    val (top0, back0, front0) = folderColors()
     Canvas(modifier) {
         val w = size.width
         val h = size.height
@@ -235,9 +250,9 @@ fun FolderIcon(modifier: Modifier) {
             lineTo(w * 0.04f, bottom)
             close()
         }
-        drawPath(back, FolderBack)
+        drawPath(back, back0)
         drawRoundRect(
-            Brush.verticalGradient(listOf(FolderTop, FolderFront), startY = h * 0.33f, endY = bottom),
+            Brush.verticalGradient(listOf(top0, front0), startY = h * 0.33f, endY = bottom),
             topLeft = Offset(w * 0.04f, h * 0.33f),
             size = Size(w * 0.92f, bottom - h * 0.33f),
             cornerRadius = CornerRadius(r, r),

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -127,7 +128,7 @@ fun FileCollection(
             if (!decided) return@awaitEachGesture
             val start = indexAt(down.position.x, down.position.y).takeIf { it >= 0 }
                 ?: indexAt(pos.x, pos.y).takeIf { it >= 0 } ?: return@awaitEachGesture
-            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
             val base = app.selected
             val adding = items[start].path !in base
             var lastEnd = -1
@@ -182,7 +183,11 @@ fun FileCollection(
             var menuOpen by remember { mutableStateOf(false) }
             val open = { if (app.selecting) app.toggle(item.path) else (onOpen ?: app::open)(item) }
             val long: (() -> Unit)? = if (app.selecting) null else ({ menuOpen = true })
-            Box(Modifier.animateItem()) {
+            val lift by androidx.compose.animation.core.animateFloatAsState(
+                if (menuOpen && !listView) 1.06f else 1f,
+                androidx.compose.animation.core.spring(dampingRatio = 0.6f, stiffness = 500f), label = "lift",
+            )
+            Box(Modifier.animateItem().graphicsLayer { scaleX = lift; scaleY = lift }) {
                 if (listView) ListCell(item, sel, subtitle, open, long) else IconCell(item, sel, subtitle, open, long)
                 IosMenu(menuOpen, { menuOpen = false }, if (menuOpen) (menu ?: app::menuFor)(item) else emptyList())
             }
