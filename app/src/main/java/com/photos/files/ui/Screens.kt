@@ -135,7 +135,7 @@ fun BrowseScreen() {
                                 ) { if (!editing) app.push(Route.Folder(p)) }
                                 IosMenu(menu, { menu = false }, listOf(
                                     MenuAction("Remove from Favorites", IosIcons.Star, destructive = true) { store.toggleFavorite(p) },
-                                ))
+                                ), spotlight = true)
                             }
                         }
                     }

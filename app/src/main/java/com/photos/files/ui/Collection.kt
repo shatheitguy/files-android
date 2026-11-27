@@ -69,8 +69,8 @@ fun AppState.menuFor(item: FileItem): List<MenuAction> {
 }
 
 @Composable
-fun IosMenu(expanded: Boolean, onDismiss: () -> Unit, actions: List<MenuAction>, offset: DpOffset = DpOffset(0.dp, 0.dp)) {
-    IosPopupMenu(expanded, onDismiss, actions.map { PopupItem(it.label, it.icon, it.destructive, it.divider, it.checked, it.run) })
+fun IosMenu(expanded: Boolean, onDismiss: () -> Unit, actions: List<MenuAction>, offset: DpOffset = DpOffset(0.dp, 0.dp), spotlight: Boolean = false) {
+    IosPopupMenu(expanded, onDismiss, actions.map { PopupItem(it.label, it.icon, it.destructive, it.divider, it.checked, it.run) }, spotlight)
 }
 
 /**
@@ -189,7 +189,7 @@ fun FileCollection(
             )
             Box(Modifier.animateItem().graphicsLayer { scaleX = lift; scaleY = lift }) {
                 if (listView) ListCell(item, sel, subtitle, open, long) else IconCell(item, sel, subtitle, open, long)
-                IosMenu(menuOpen, { menuOpen = false }, if (menuOpen) (menu ?: app::menuFor)(item) else emptyList())
+                IosMenu(menuOpen, { menuOpen = false }, if (menuOpen) (menu ?: app::menuFor)(item) else emptyList(), spotlight = true)
             }
         }
         if (footer != null) {
