@@ -146,8 +146,11 @@ class FileStore private constructor(private val ctx: Context) {
 
     // ---------- Volumes ----------
 
+    /** "On My Tablet" on tablets, like "On My iPad". */
+    val deviceName: String get() = if (ctx.resources.configuration.smallestScreenWidthDp >= 600) "On My Tablet" else "On My Phone"
+
     fun volumes(): List<Volume> {
-        val out = mutableListOf(Volume("On My Phone", root, false))
+        val out = mutableListOf(Volume(deviceName, root, false))
         runCatching {
             val sm = ctx.getSystemService(StorageManager::class.java)
             sm.storageVolumes.filter { it.isRemovable }.forEach { v ->

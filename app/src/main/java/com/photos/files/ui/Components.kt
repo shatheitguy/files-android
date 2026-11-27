@@ -164,7 +164,7 @@ enum class FilesTab(val label: String) { Recents("Recents"), Browse("Browse"), S
 fun FloatingTabBar(current: FilesTab, onSelect: (FilesTab) -> Unit, modifier: Modifier = Modifier) {
     val c = LocalIos.current
     val (container, border, _) = glass()
-    val selectedBg = if (c.dark) Color(0xFF111113) else Color(0xFFE8E8EB)
+    val selectedBg = systemAccent()
     Box(
         modifier.fillMaxWidth().navigationBarsPadding().padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
         contentAlignment = Alignment.Center,
@@ -185,7 +185,7 @@ fun FloatingTabBar(current: FilesTab, onSelect: (FilesTab) -> Unit, modifier: Mo
                 onSelect = { onSelect(tabs[it]) },
             ) { i, active ->
                 val t = tabs[i]
-                val col = c.label
+                val col = if (active) Color.White else c.label
                 Column(
                     Modifier.fillMaxSize().clip(CircleShape).tap { onSelect(t) },
                     horizontalAlignment = Alignment.CenterHorizontally,

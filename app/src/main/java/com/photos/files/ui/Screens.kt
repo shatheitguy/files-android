@@ -227,7 +227,7 @@ fun FolderScreen(path: String) {
         if (items != null && list.isEmpty()) {
             EmptyState(if (missing) "Folder Not Found" else "Folder Is Empty", if (missing) "It may have been moved or deleted." else footer)
         }
-        ScreenTopBar(title, scrolled, onBack = { app.pop() }, leading = if (app.selecting) ({ SelectAllPill(list) }) else null) {
+        ScreenTopBar(title, scrolled, onBack = backUnlessRoot { app.pop() }, leading = if (app.selecting) ({ SelectAllPill(list) }) else null) {
             if (app.selecting) {
                 GlassPill("Done") { app.clearSelection() }
             } else {
@@ -370,7 +370,7 @@ fun TagScreen(tag: TagColor) {
             item(span = { GridItemSpan(maxLineSpan) }) { LargeHeader(tag.label) }
         }
         if (items != null && list.isEmpty()) EmptyState("No Items", "Long-press a file and choose Tags to add it here.")
-        ScreenTopBar(tag.label, scrolled, onBack = { app.pop() }, leading = if (app.selecting) ({ SelectAllPill(list) }) else null) {
+        ScreenTopBar(tag.label, scrolled, onBack = backUnlessRoot { app.pop() }, leading = if (app.selecting) ({ SelectAllPill(list) }) else null) {
             if (app.selecting) GlassPill("Done") { app.clearSelection() }
             else { GlassPill("Select", enabled = list.isNotEmpty()) { app.startSelecting() }; ViewMenuButton(showSort = false, folder = null) }
         }
@@ -413,7 +413,7 @@ fun TrashScreen() {
             item(span = { GridItemSpan(maxLineSpan) }) { LargeHeader("Recently Deleted") }
         }
         if (entries != null && list.isEmpty()) EmptyState("No Recently Deleted Items", "Deleted files stay here for 30 days.")
-        ScreenTopBar("Recently Deleted", scrolled, onBack = { app.pop() }) {
+        ScreenTopBar("Recently Deleted", scrolled, onBack = backUnlessRoot { app.pop() }) {
             if (app.selecting) GlassPill("Done") { app.clearSelection() }
             else GlassPill("Select", enabled = list.isNotEmpty()) { app.startSelecting() }
         }
@@ -482,7 +482,7 @@ fun SelectAllPill(list: List<FileItem>) {
 }
 
 @Composable
-private fun RemoveDot(onClick: () -> Unit) {
+fun RemoveDot(onClick: () -> Unit) {
     Box(
         Modifier.size(22.dp).clip(CircleShape).background(LocalIos.current.red).tap(onClick = onClick),
         contentAlignment = Alignment.Center,

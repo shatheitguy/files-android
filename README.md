@@ -14,6 +14,7 @@ An iPhone-style file manager for Android, built natively with Kotlin and Jetpack
 - Locations: **On My Phone**, SD card and **USB drives** (they only appear while plugged in), and **Recently Deleted** (30 days).
 - **Favorites** and colored **Tags**. Every section can be collapsed or expanded.
 - ••• menu: **Edit**, **Connect to Server**, **Scan Documents** and **Settings**.
+- **Tablets** get the iPad layout: a sidebar with Recents, Locations, Shared, Favorites and Tags beside your files, and Move / Copy as a centred sheet.
 
 ### Folders
 - Icons or List view; sort by Name, Kind, Date or Size; show hidden files.

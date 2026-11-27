@@ -142,7 +142,7 @@ fun SmbScreen(serverId: String, path: String) {
             entries == null -> CircularProgressIndicator(Modifier.align(Alignment.Center), color = c.secondary)
             items.isEmpty() -> EmptyState("Folder Is Empty", if (canWrite) "Tap ••• to upload files." else "")
         }
-        ScreenTopBar(title, scrolled, onBack = { app.pop() }) {
+        ScreenTopBar(title, scrolled, onBack = backUnlessRoot { app.pop() }) {
             var open by remember { mutableStateOf(false) }
             Box {
                 GlassCircle(IosIcons.More) { open = true }

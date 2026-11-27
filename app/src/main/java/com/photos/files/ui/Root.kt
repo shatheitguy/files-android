@@ -84,11 +84,11 @@ private fun PermissionScreen(onContinue: () -> Unit) {
         Spacer(Modifier.height(12.dp))
         Text(
             "To browse and organize everything on your phone, turn on “Allow access to manage all files” for Files on the next screen.",
-            fontSize = 17.sp, color = c.secondary, textAlign = TextAlign.Center,
+            fontSize = 17.sp, color = c.secondary, textAlign = TextAlign.Center, modifier = Modifier.widthIn(max = 520.dp),
         )
         Spacer(Modifier.height(32.dp))
         Box(
-            Modifier.fillMaxWidth().height(50.dp).clip(RoundedCornerShape(14.dp)).background(c.accent).tap(onClick = onContinue),
+            Modifier.widthIn(max = 420.dp).fillMaxWidth().height(50.dp).clip(RoundedCornerShape(14.dp)).background(c.accent).tap(onClick = onContinue),
             contentAlignment = Alignment.Center,
         ) {
             Text("Continue", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
@@ -114,7 +114,7 @@ fun FilesRoot(store: FileStore) {
     val updates = rememberUpdateCenter()
     LaunchedEffect(store.version) { updates.tick++ }
     CompositionLocalProvider(LocalApp provides app, LocalFileStore provides store, LocalUpdates provides updates) {
-        BackHandler(enabled = app.selecting || app.canPop || app.tab != FilesTab.Browse) {
+        BackHandler(enabled = app.selecting || app.canPop || app.tab != FilesTab.Browse || app.side != null) {
             when {
                 app.selecting -> app.clearSelection()
                 app.canPop -> app.pop()
@@ -122,19 +122,24 @@ fun FilesRoot(store: FileStore) {
             }
         }
         val c = LocalIos.current
+        val tablet = isTablet()
         Box(Modifier.fillMaxSize().background(c.bg)) {
-            when (app.tab) {
-                FilesTab.Browse -> BrowseScreen()
-                FilesTab.Recents -> RecentsScreen()
-                FilesTab.Search -> SearchScreen()
-            }
-            app.stack.forEach { e ->
-                key(e.id) {
-                    if (e.route !is Route.Picker) RouteHost(e)
+            if (tablet) {
+                SplitLayout(sidebar = { FilesSidebar() }) { FilesPane() }
+            } else {
+                when (app.tab) {
+                    FilesTab.Browse -> BrowseScreen()
+                    FilesTab.Recents -> RecentsScreen()
+                    FilesTab.Search -> SearchScreen()
                 }
-            }
-            if (!app.selecting && app.top !is Route.Settings) {
-                FloatingTabBar(app.tab, { app.selectTab(it) }, Modifier.align(Alignment.BottomCenter))
+                app.stack.forEach { e ->
+                    key(e.id) {
+                        if (e.route !is Route.Picker) RouteHost(e)
+                    }
+                }
+                if (!app.selecting && app.top !is Route.Settings) {
+                    FloatingTabBar(app.tab, { app.selectTab(it) }, Modifier.align(Alignment.BottomCenter))
+                }
             }
             app.stack.lastOrNull { it.route is Route.Picker }?.let { e ->
                 key(e.id) {
@@ -159,7 +164,7 @@ fun FilesRoot(store: FileStore) {
 }
 
 @Composable
-private fun RouteHost(e: RouteEntry) {
+fun RouteHost(e: RouteEntry) {
     SlideIn(e.closing) {
         when (val r = e.route) {
             is Route.Folder -> FolderScreen(r.path)
@@ -196,8 +201,19 @@ fun SheetIn(closing: Boolean, content: @Composable () -> Unit) {
         if (closing) p.animateTo(0f, tween(260, easing = androidx.compose.animation.core.FastOutLinearInEasing))
         else p.animateTo(1f, androidx.compose.animation.core.spring(dampingRatio = 0.86f, stiffness = 320f))
     }
+    val tablet = isTablet()
     Box(Modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize().graphicsLayer { alpha = p.value.coerceIn(0f, 1f) }.background(Color(0x80000000)).blockTouches())
+        if (tablet) {
+            // iPad form sheet: a centred card that rises from the bottom.
+            Box(
+                Modifier.align(Alignment.Center).systemBarsPadding().padding(vertical = 24.dp)
+                    .widthIn(max = 600.dp).fillMaxWidth(0.9f).fillMaxHeight(0.88f)
+                    .graphicsLayer { translationY = (1f - p.value) * 1600f }
+                    .shadow(30.dp, RoundedCornerShape(16.dp)).clip(RoundedCornerShape(16.dp)).blockTouches(),
+            ) { content() }
+            return@Box
+        }
         Box(
             Modifier.fillMaxSize().statusBarsPadding().padding(top = 10.dp)
                 .graphicsLayer { translationY = (1f - p.value) * size.height }
@@ -281,7 +297,7 @@ private fun InfoSheet(item: FileItem, onDismiss: () -> Unit) {
             GroupCard {
                 InfoRow("Kind", kindLabel(item))
                 InfoRow("Size", if (item.isDir) folderInfo?.let { "${Fmt.size(it.first)} (${Fmt.items(it.second)})" } ?: "…" else Fmt.size(item.size))
-                InfoRow("Where", File(item.path).parent?.removePrefix(store.root)?.ifEmpty { "/" }?.let { "On My Phone$it" } ?: "")
+                InfoRow("Where", File(item.path).parent?.removePrefix(store.root)?.ifEmpty { "/" }?.let { "${store.deviceName}$it" } ?: "")
                 InfoRow("Modified", Fmt.full(item.modified), last = true)
             }
             val tags = store.tagsOf(item.path)

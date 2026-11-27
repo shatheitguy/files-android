@@ -109,3 +109,12 @@ fun FilesTheme(content: @Composable () -> Unit) {
         }
     }
 }
+
+/** The phone's own accent colour (Material You), used only for the tab bar highlight. iOS blue on older Android. */
+@Composable
+fun systemAccent(): Color {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    val c = LocalIos.current
+    if (android.os.Build.VERSION.SDK_INT < 31) return c.accent
+    return Color(ctx.getColor(if (c.dark) android.R.color.system_accent1_500 else android.R.color.system_accent1_600))
+}

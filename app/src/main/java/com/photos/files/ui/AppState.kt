@@ -42,6 +42,9 @@ const val PhotosPackage = "com.photos.gallery"
 
 class AppState(private val ctx: Context, val store: FileStore, private val scope: CoroutineScope) {
     var tab by mutableStateOf(FilesTab.Browse)
+    /** iPad layout: the place picked in the sidebar (a folder, tag, Recently Deleted or a server). Null means [tab]. */
+    var side by mutableStateOf<Route?>(null)
+        private set
     val stack = mutableStateListOf<RouteEntry>()
 
     var selecting by mutableStateOf(false)
@@ -111,7 +114,14 @@ class AppState(private val ctx: Context, val store: FileStore, private val scope
     fun selectTab(t: FilesTab) {
         clearSelection()
         stack.removeAll { it.route !is Route.Picker }
+        side = null
         tab = t
+    }
+
+    fun selectSide(r: Route) {
+        clearSelection()
+        stack.removeAll { it.route !is Route.Picker }
+        side = r
     }
 
     fun startSelecting() { selecting = true; selected = emptySet() }
