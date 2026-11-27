@@ -33,6 +33,8 @@ private var routeIds = 0L
 class RouteEntry(val route: Route) {
     val id = routeIds++
     var closing by mutableStateOf(false)
+    /** Put back when returning to a tab: shown straight away, without sliding in again. */
+    var instant = false
 }
 
 val LocalApp = staticCompositionLocalOf<AppState> { error("no app state") }
@@ -111,10 +113,27 @@ class AppState(private val ctx: Context, val store: FileStore, private val scope
         }
     }
 
-    fun selectTab(t: FilesTab) {
+    private val saved = mutableMapOf<FilesTab, List<RouteEntry>>()
+
+    /**
+     * Like iOS: each tab remembers the folders you opened, and tapping the tab you're already on goes back
+     * to its top level. [keep] = false (tablet sidebar) always opens the place fresh.
+     */
+    fun selectTab(t: FilesTab, keep: Boolean = true) {
         clearSelection()
+        val open = stack.filter { it.route !is Route.Picker && !it.closing }
+        if (keep && side == null && t == tab) {
+            open.forEach(::close)
+            saved.remove(t)
+            return
+        }
+        if (keep && side == null) saved[tab] = open else saved.clear()
         stack.removeAll { it.route !is Route.Picker }
         side = null
+        if (keep) saved.remove(t)?.let { back ->
+            back.forEach { it.instant = true }
+            stack.addAll(0, back)
+        }
         tab = t
     }
 

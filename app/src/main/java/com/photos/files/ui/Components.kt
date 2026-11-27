@@ -163,6 +163,7 @@ enum class FilesTab(val label: String) { Recents("Recents"), Browse("Browse"), S
 @Composable
 fun FloatingTabBar(current: FilesTab, onSelect: (FilesTab) -> Unit, modifier: Modifier = Modifier) {
     val c = LocalIos.current
+    val tickCtx = androidx.compose.ui.platform.LocalContext.current
     val (container, border, _) = glass()
     val selectedBg = systemAccent()
     Box(
@@ -182,12 +183,12 @@ fun FloatingTabBar(current: FilesTab, onSelect: (FilesTab) -> Unit, modifier: Mo
                 itemWidth = 88.dp,
                 itemHeight = 56.dp,
                 highlight = selectedBg,
-                onSelect = { onSelect(tabs[it]) },
+                onSelect = { Haptics.tick(tickCtx); onSelect(tabs[it]) },
             ) { i, active ->
                 val t = tabs[i]
                 val col = if (active) Color.White else c.label
                 Column(
-                    Modifier.fillMaxSize().clip(CircleShape).tap { onSelect(t) },
+                    Modifier.fillMaxSize().clip(CircleShape).tap { Haptics.tick(tickCtx); onSelect(t) },
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
@@ -199,7 +200,7 @@ fun FloatingTabBar(current: FilesTab, onSelect: (FilesTab) -> Unit, modifier: Mo
         }
         Box(
             Modifier.align(Alignment.CenterEnd).size(60.dp).shadow(14.dp, CircleShape, clip = false).clip(CircleShape)
-                .background(container).border(0.5.dp, border, CircleShape).tap { onSelect(FilesTab.Search) },
+                .background(container).border(0.5.dp, border, CircleShape).tap { Haptics.tick(tickCtx); onSelect(FilesTab.Search) },
             contentAlignment = Alignment.Center,
         ) {
             Icon(IosIcons.Search, null, tint = c.label, modifier = Modifier.size(26.dp))

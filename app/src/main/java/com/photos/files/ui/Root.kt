@@ -165,7 +165,7 @@ fun FilesRoot(store: FileStore) {
 
 @Composable
 fun RouteHost(e: RouteEntry) {
-    SlideIn(e.closing) {
+    SlideIn(e.closing, e.instant) {
         when (val r = e.route) {
             is Route.Folder -> FolderScreen(r.path)
             is Route.Tag -> TagScreen(r.tag)
@@ -179,11 +179,11 @@ fun RouteHost(e: RouteEntry) {
 }
 
 @Composable
-fun SlideIn(closing: Boolean = false, content: @Composable () -> Unit) {
-    val p = remember { Animatable(0f) }
+fun SlideIn(closing: Boolean = false, instant: Boolean = false, content: @Composable () -> Unit) {
+    val p = remember { Animatable(if (instant) 1f else 0f) }
     LaunchedEffect(closing) {
         if (closing) p.animateTo(0f, tween(240, easing = androidx.compose.animation.core.FastOutLinearInEasing))
-        else p.animateTo(1f, tween(320, easing = FastOutSlowInEasing))
+        else p.animateTo(1f, tween(420, easing = androidx.compose.animation.core.CubicBezierEasing(0.22f, 1f, 0.36f, 1f)))
     }
     Box(
         Modifier.fillMaxSize().graphicsLayer {

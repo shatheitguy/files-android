@@ -17,6 +17,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         window.isNavigationBarContrastEnforced = false
+        useFastestRefreshRate()
         val store = FileStore.get(this)
         setContent {
             FilesTheme {
@@ -51,5 +52,21 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         resumeTick.intValue++
         FileStore.get(this).changed()
+    }
+
+    /** Ask for the screen's highest refresh rate (90/120 Hz) at the current resolution, so everything moves smoothly. */
+    private fun useFastestRefreshRate() {
+        runCatching {
+            val d = if (android.os.Build.VERSION.SDK_INT >= 30) display else @Suppress("DEPRECATION") windowManager.defaultDisplay
+            d ?: return
+            val cur = d.mode
+            val best = d.supportedModes
+                .filter { it.physicalWidth == cur.physicalWidth && it.physicalHeight == cur.physicalHeight }
+                .maxByOrNull { it.refreshRate } ?: return
+            window.attributes = window.attributes.apply {
+                preferredDisplayModeId = best.modeId
+                preferredRefreshRate = best.refreshRate
+            }
+        }
     }
 }

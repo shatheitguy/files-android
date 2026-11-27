@@ -31,13 +31,13 @@ fun FilesSidebar() {
             BrowseMoreButton(editing, onEdit = { editing = !editing }, onConnect = { app.connectServer = true })
         }
         SidebarList {
-            item { SidebarRow("Recents", IosIcons.Clock, selected = onTab && app.tab == FilesTab.Recents) { app.selectTab(FilesTab.Recents) } }
-            item { SidebarRow("Search", IosIcons.Search, selected = onTab && app.tab == FilesTab.Search) { app.selectTab(FilesTab.Search) } }
+            item { SidebarRow("Recents", IosIcons.Clock, selected = onTab && app.tab == FilesTab.Recents) { app.selectTab(FilesTab.Recents, keep = false) } }
+            item { SidebarRow("Search", IosIcons.Search, selected = onTab && app.tab == FilesTab.Search) { app.selectTab(FilesTab.Search, keep = false) } }
             sidebarSection("loc", "Locations") {
                 volumes.forEachIndexed { i, v ->
                     val icon = when { v.usb -> IosIcons.Usb; v.removable -> IosIcons.SdCard; else -> IosIcons.Phone }
                     if (i == 0) {
-                        SidebarRow(v.title, icon, selected = onTab && app.tab == FilesTab.Browse) { app.selectTab(FilesTab.Browse) }
+                        SidebarRow(v.title, icon, selected = onTab && app.tab == FilesTab.Browse) { app.selectTab(FilesTab.Browse, keep = false) }
                     } else {
                         val r = Route.Folder(v.path)
                         SidebarRow(v.title, icon, selected = side == r) { app.selectSide(r) }
