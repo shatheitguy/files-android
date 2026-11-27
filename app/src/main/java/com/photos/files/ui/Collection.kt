@@ -128,7 +128,6 @@ fun FileCollection(
             if (!decided) return@awaitEachGesture
             val start = indexAt(down.position.x, down.position.y).takeIf { it >= 0 }
                 ?: indexAt(pos.x, pos.y).takeIf { it >= 0 } ?: return@awaitEachGesture
-            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
             val base = app.selected
             val adding = items[start].path !in base
             var lastEnd = -1

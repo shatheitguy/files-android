@@ -96,6 +96,7 @@ class AppState(private val ctx: Context, val store: FileStore, private val scope
     fun push(r: Route) {
         clearSelection()
         stack += RouteEntry(r)
+        saveNav()
     }
 
     fun pop() {
@@ -110,6 +111,7 @@ class AppState(private val ctx: Context, val store: FileStore, private val scope
         scope.launch {
             kotlinx.coroutines.delay(250)
             stack.remove(e)
+            saveNav()
         }
     }
 
@@ -135,6 +137,44 @@ class AppState(private val ctx: Context, val store: FileStore, private val scope
             stack.addAll(0, back)
         }
         tab = t
+        saveNav()
+    }
+
+    // ---------- Remember where you were, even after the app closes (like iOS Files) ----------
+
+    private val navPrefs = ctx.getSharedPreferences("nav", Context.MODE_PRIVATE)
+
+    private fun Route.code(): String? = when (this) {
+        is Route.Folder -> "F:$path"
+        is Route.Tag -> "T:${tag.name}"
+        Route.Trash -> "X"
+        else -> null
+    }
+
+    private fun decode(c: String): Route? = when {
+        c.startsWith("F:") -> c.substring(2).takeIf { File(it).isDirectory }?.let { Route.Folder(it) }
+        c.startsWith("T:") -> runCatching { Route.Tag(TagColor.valueOf(c.substring(2))) }.getOrNull()
+        c == "X" -> Route.Trash
+        else -> null
+    }
+
+    /** Saves the current tab and the folders open in Browse. */
+    fun saveNav() {
+        val browse = if (tab == FilesTab.Browse && side == null) stack.filter { !it.closing } else saved[FilesTab.Browse].orEmpty()
+        val codes = browse.mapNotNull { it.route.code() }
+        navPrefs.edit().putString("tab", tab.name).putString("browse", codes.joinToString("\u0000")).apply()
+    }
+
+    private fun restoreNav() {
+        val t = runCatching { FilesTab.valueOf(navPrefs.getString("tab", "") ?: "") }.getOrNull() ?: return
+        val entries = navPrefs.getString("browse", "").orEmpty().split('\u0000').filter { it.isNotEmpty() }
+            .mapNotNull { decode(it) }.map { RouteEntry(it).apply { instant = true } }
+        if (t == FilesTab.Search) tab = FilesTab.Browse else tab = t
+        if (tab == FilesTab.Browse) stack.addAll(entries) else if (entries.isNotEmpty()) saved[FilesTab.Browse] = entries
+    }
+
+    init {
+        restoreNav()
     }
 
     fun selectSide(r: Route) {
