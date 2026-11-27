@@ -12,8 +12,8 @@ android {
         applicationId = "com.photos.files"
         minSdk = 29
         targetSdk = 35
-        versionCode = 17
-        versionName = "1.0.1"
+        versionCode = 18
+        versionName = "1.0.2"
     }
 
     buildTypes {
@@ -42,5 +42,6 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("org.codelibs:jcifs:2.1.39")
+    implementation("com.tom-roush:pdfbox-android:2.0.27.0") { exclude(group = "org.bouncycastle") }
     implementation("com.google.android.gms:play-services-mlkit-document-scanner:16.0.0-beta1")
 }

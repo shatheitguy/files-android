@@ -209,6 +209,7 @@ class AppState(private val ctx: Context, val store: FileStore, private val scope
             item.kind == FileKind.Archive && item.ext == "zip" -> uncompress(item)
             (item.kind == FileKind.Text || item.kind == FileKind.Code) && item.size < 2_000_000 -> push(Route.QuickLook(item.path))
             item.kind == FileKind.Image || item.kind == FileKind.Video -> openMedia(item)
+            item.ext == "pdf" -> com.photos.files.PdfActivity.open(ctx, item.path)
             item.kind == FileKind.App -> launchView(uriFor(item.path), "application/vnd.android.package-archive", null)
             else -> launchView(uriFor(item.path), item.mime, null)
         }
