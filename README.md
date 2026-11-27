@@ -4,8 +4,8 @@
 
 # Files for Android
 
-**The iPhone Files app, rebuilt natively for Android.**<br>
-Browse every folder, USB drive and network share on your phone, with the calm, familiar feel of iOS.
+**Files. Now on Android.**<br>
+Browse every folder, USB drive, network share and cloud drive on your phone — with the calm, familiar feel of the iPhone Files app.
 
 [![Latest release](https://img.shields.io/github/v/release/shatheitguy/files-android?style=for-the-badge&label=Download&color=ff5e7e)](https://github.com/shatheitguy/files-android/releases/latest)
 [![Website](https://img.shields.io/badge/Website-visit-8a5cff?style=for-the-badge)](https://shatheitguy.github.io/files-android/)
@@ -24,44 +24,66 @@ Browse every folder, USB drive and network share on your phone, with the calm, f
 
 ## ✨ Features
 
-### 🗂️ Browse
-- **Recents · Browse · Search** with a floating tab bar. Press it and slide your finger to switch tabs.
-- **On My Phone**, SD card and **USB drives** (they only appear while plugged in), and **Recently Deleted** (30 days).
-- **Favorites** and colored **Tags**. Every section folds away with a tap.
-- **•••** menu: Edit, Connect to Server, Scan Documents, Settings and Check for Updates.
+**Every file, beautifully organized.** Designed to feel instantly familiar, built natively for Android.
 
-### 📁 Folders
-- Icons or List view, sorted by Name, Kind, Date or Size, with hidden files on demand.
-- **Aspect-ratio thumbnails** for photos, videos, PDFs and APKs.
-- Long-press menu: Get Info, Rename, Compress / Uncompress (ZIP), Duplicate, Tags, Copy, Move, Share, Delete.
-- **Select** mode with Select All. Swipe across files to select many at once.
-- Copy and Move use an iOS-style sheet and a live **progress pill**.
+### 🗂️ Browse, Recents and Search
+_The floating tab bar you can slide your finger across._
 
-### 🌐 Connect to Server
-- **SMB 2/3** shares on a Windows PC, Mac or NAS: browse, open, download, upload, new folder, delete.
+- On My Phone, SD card and USB drives (shown when plugged in)
+- Your cloud storage apps, shown only when installed
+- Move Locations up or down with Edit
+- Collapsible Locations, Favorites and Tags
+- Icons or List, sort by Name, Kind, Date or Size
+- Aspect-ratio thumbnails for photos, videos, PDFs and apps
 
-### 📄 Scan Documents
-- Scan paper with the camera and save it as a PDF in `Documents/Scans`.
+### 📁 Organize anything
+_Long-press for the menu you expect._
 
-### 📱 Tablets
-- An **iPad-style layout**: a sidebar with Recents, Search, Locations, Shared, Favorites and Tags beside your files.
-- Your storage shows as **On My Tablet**, and Move / Copy opens as a centered sheet.
+- Swipe across files to select many at once
+- Rename, Duplicate, Copy, Move — with live progress
+- Compress and uncompress ZIP files
+- Recently Deleted keeps files for 30 days
+- Remembers the folder you were in, even after closing
 
-### 🤝 Works with Photos
-- Pictures and videos open in **[Photos for Android](https://github.com/shatheitguy/photos-android)**, so you can swipe through the folder.
-- **Save to Files** appears in every share sheet.
-- Moves and deletes show up in Photos straight away.
+### 🌐 Connect to Server & Scan
+_From the ••• menu on Browse, just like iPhone._
 
-### ⚙️ And more
-- Glass menus and buttons, light / dark / automatic appearance.
-- **Check for Updates** downloads and installs new versions right inside the app.
+- SMB shares on your PC, Mac or NAS
+- Open, download, upload, new folder, delete
+- Scan paper documents straight to PDF
+
+### 📱 Made for tablets too
+_An iPad-style sidebar beside your files on big screens._
+
+- Recents, Locations, Shared, Favorites and Tags
+- “On My Tablet”, and Move / Copy as a centered sheet
+
+### ⬇️ Updates built in
+_Files tells you when a new version is out._
+
+- Download with a live progress ring
+- Install straight from the app
+- Glass menus and buttons, light or dark
+
+## 🤝 Two apps that feel like one.
+
+Open a picture in Files and it opens in Photos, so you can swipe through the whole folder. “Save to Files” appears in every share sheet, and moves or deletes show up in Photos instantly.
+
+👉 [Get Photos for Android](https://github.com/shatheitguy/photos-android)
+
+## 🔒 Privacy
+
+No accounts, no ads, no analytics. Files only uses the internet to reach the servers you add and to check GitHub for new versions. Cloud storage opens in its own app, and saved server passwords stay in the app's private storage.
 
 ## 📥 Install
-1. Download **`Files.apk`** from the [latest release](https://github.com/shatheitguy/files-android/releases/latest).
-2. Open it on your phone and allow installing from this source if Android asks.
-3. Open **Files**, tap **Continue** and turn on **Allow access to manage all files**.
 
-> Requires **Android 10 or newer**. Scan Documents uses Google Play services.
+**Up and running in a minute.**
+
+1. **Download**: Get `Files.apk` from the [latest release](https://github.com/shatheitguy/files-android/releases/latest).
+2. **Install**: Open the file on your phone. If Android asks, allow installing from this source.
+3. **Allow access**: Open Files, tap **Continue** and turn on **Allow access to manage all files**.
+
+> Requires **Android 10 or newer**.
 
 ## 🛠️ Build from source
 You need JDK 17 and the Android SDK (platform 35).
@@ -85,12 +107,14 @@ app/src/main/java/com/photos/files/
 ├── data/
 │   ├── FileStore.kt         Listing, sorting, recents, trash, zip, volumes
 │   ├── Smb.kt               SMB servers and shares
+│   ├── Cloud.kt             Cloud drive apps on the phone
 │   └── Thumbs.kt            Thumbnails for photos, videos, PDFs and APKs
 └── ui/
     ├── Root.kt              Navigation, sheets, dialogs, progress pill
     ├── Screens.kt           Browse, Recents, Folder, Tags, Trash, Search
     ├── Collection.kt        File grid / list, selection, menus
     ├── SmbScreen.kt         Server browser
+    ├── Locations.kt         Locations order and cloud drives
     ├── FilesTablet.kt       iPad-style sidebar and pane
     ├── FilesSettings.kt     Settings, ••• menu, document scanner
     ├── Updates.kt           In-app updates
@@ -98,10 +122,9 @@ app/src/main/java/com/photos/files/
 ```
 </details>
 
-## 🔒 Privacy
-No accounts, no ads, no analytics. Files only uses the internet to reach the servers you add and to check GitHub for new versions. Saved server passwords stay in the app's private storage.
-
 ## 👤 Author
+
+**Hi, I'm Sharqan.** I build Android apps that feel as calm and polished as the ones on iPhone, with no ads, no tracking, and everything staying on your phone.
 
 <table>
   <tr>
