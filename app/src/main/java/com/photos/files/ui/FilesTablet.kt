@@ -23,6 +23,7 @@ fun FilesSidebar() {
     val ctx = LocalContext.current
     val volumes = remember(store.version) { store.volumes() }
     val smb = remember { SmbStore.get(ctx) }
+    val clouds = rememberCloudDrives()
     var editing by remember { mutableStateOf(false) }
     val side = app.side
     val onTab = side == null
@@ -42,6 +43,10 @@ fun FilesSidebar() {
                         val r = Route.Folder(v.path)
                         SidebarRow(v.title, icon, selected = side == r) { app.selectSide(r) }
                     }
+                }
+                clouds.forEach { d ->
+                    val r = Route.Cloud(d.authority, d.title)
+                    SidebarRow(d.title, selected = side == r, leading = { CloudIcon(d, 22.dp) }) { app.selectSide(r) }
                 }
                 SidebarRow("Recently Deleted", IosIcons.Trash, selected = side == Route.Trash) { app.selectSide(Route.Trash) }
             }
@@ -96,6 +101,7 @@ fun FilesPane() {
                     s is Route.Tag -> TagScreen(s.tag)
                     s == Route.Trash -> TrashScreen()
                     s is Route.Smb -> SmbScreen(s.serverId, s.path)
+                    s is Route.Cloud -> CloudScreen(s.authority, s.title, s.dirId, s.name)
                     tab == FilesTab.Recents -> RecentsScreen()
                     tab == FilesTab.Search -> SearchScreen()
                     else -> FolderScreen(store.root)

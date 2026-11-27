@@ -23,6 +23,7 @@ sealed interface Route {
     data class Picker(val mode: PickMode, val paths: List<String>) : Route
     data class QuickLook(val path: String) : Route
     data class Smb(val serverId: String, val path: String) : Route
+    data class Cloud(val authority: String, val title: String, val dirId: String = "", val name: String = "") : Route
     data class Settings(val about: Boolean = false) : Route
 }
 
@@ -147,12 +148,14 @@ class AppState(private val ctx: Context, val store: FileStore, private val scope
     private fun Route.code(): String? = when (this) {
         is Route.Folder -> "F:$path"
         is Route.Tag -> "T:${tag.name}"
+        is Route.Cloud -> "C:" + listOf(authority, title, dirId, name).joinToString("\u0001")
         Route.Trash -> "X"
         else -> null
     }
 
     private fun decode(c: String): Route? = when {
         c.startsWith("F:") -> c.substring(2).takeIf { File(it).isDirectory }?.let { Route.Folder(it) }
+        c.startsWith("C:") -> c.substring(2).split('\u0001').takeIf { it.size == 4 }?.let { Route.Cloud(it[0], it[1], it[2], it[3]) }
         c.startsWith("T:") -> runCatching { Route.Tag(TagColor.valueOf(c.substring(2))) }.getOrNull()
         c == "X" -> Route.Trash
         else -> null

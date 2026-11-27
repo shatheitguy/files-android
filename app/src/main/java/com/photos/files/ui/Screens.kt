@@ -47,6 +47,7 @@ fun BrowseScreen() {
     val volumes = remember(store.version) { store.volumes() }
     val ctx = androidx.compose.ui.platform.LocalContext.current
     val smb = remember { com.photos.files.data.SmbStore.get(ctx) }
+    val clouds = rememberCloudDrives()
     var editing by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize().background(if (c.dark) c.bg else c.grouped)) {
         LazyColumn(
@@ -80,6 +81,10 @@ fun BrowseScreen() {
                             title = v.title,
                             detail = "${Fmt.size(store.freeSpace(v.path))} free",
                         ) { app.push(Route.Folder(v.path)) }
+                    }
+                    // Cloud drives on this phone (Nextcloud, OneDrive, Google Drive…), only when installed.
+                    clouds.forEach { d ->
+                        GroupRow(icon = { CloudIcon(d) }, title = d.title) { app.push(Route.Cloud(d.authority, d.title)) }
                     }
                     GroupRow(
                         icon = { Icon(IosIcons.Trash, null, tint = c.label, modifier = Modifier.size(24.dp)) },

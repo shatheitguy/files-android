@@ -12,6 +12,10 @@
 
     <queries>
         <package android:name="com.photos.gallery" />
+        <!-- Cloud drives (Nextcloud, OneDrive, Google Drive…) shown under Locations. -->
+        <intent>
+            <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
+        </intent>
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:mimeType="*/*" />

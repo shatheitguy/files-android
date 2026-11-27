@@ -172,6 +172,7 @@ fun RouteHost(e: RouteEntry) {
             Route.Trash -> TrashScreen()
             is Route.QuickLook -> QuickLookScreen(r.path)
             is Route.Smb -> SmbScreen(r.serverId, r.path)
+            is Route.Cloud -> CloudScreen(r.authority, r.title, r.dirId, r.name)
             is Route.Settings -> FilesSettingsScreen(r.about)
             is Route.Picker -> Unit
         }
