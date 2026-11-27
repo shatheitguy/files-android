@@ -403,6 +403,7 @@ fun GroupRow(
     last: Boolean = false,
     chevron: Boolean = true,
     onLongClick: (() -> Unit)? = null,
+    trailing: (@Composable () -> Unit)? = null,
     onClick: () -> Unit,
 ) {
     val c = LocalIos.current
@@ -414,8 +415,9 @@ fun GroupRow(
             Box(Modifier.size(28.dp), contentAlignment = Alignment.Center) { icon() }
             Spacer(Modifier.width(14.dp))
             Text(title, fontSize = 17.sp, color = c.label, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-            if (detail != null) Text(detail, fontSize = 15.sp, color = c.secondary, maxLines = 1)
-            if (chevron) {
+            if (trailing != null) trailing()
+            else if (detail != null) Text(detail, fontSize = 15.sp, color = c.secondary, maxLines = 1)
+            if (chevron && trailing == null) {
                 Spacer(Modifier.width(6.dp))
                 Icon(IosIcons.ChevronRight, null, tint = c.tertiary, modifier = Modifier.size(14.dp))
             }

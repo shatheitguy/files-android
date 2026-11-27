@@ -70,21 +70,26 @@ fun BrowseScreen() {
             item {
                 Collapsible("Locations") {
                 GroupCard {
-                    volumes.forEachIndexed { i, v ->
-                        GroupRow(
-                            icon = {
-                                Icon(
-                                    when { v.usb -> IosIcons.Usb; v.removable -> IosIcons.SdCard; else -> IosIcons.Phone }, null,
-                                    tint = c.label, modifier = Modifier.size(24.dp),
-                                )
-                            },
-                            title = v.title,
-                            detail = "${Fmt.size(store.freeSpace(v.path))} free",
-                        ) { app.push(Route.Folder(v.path)) }
-                    }
-                    // Cloud drives on this phone (Nextcloud, OneDrive, Google Drive…), only when installed.
-                    clouds.forEach { d ->
-                        GroupRow(icon = { CloudIcon(d) }, title = d.title) { app.push(Route.Cloud(d.authority, d.title)) }
+                    val locs = orderedLocations(volumes, clouds)
+                    locs.forEachIndexed { i, l ->
+                        val arrows: (@Composable () -> Unit)? = if (editing) ({ MoveArrows(locs, i) }) else null
+                        when (l) {
+                            is Location.Vol -> GroupRow(
+                                icon = {
+                                    Icon(
+                                        when { l.v.usb -> IosIcons.Usb; l.v.removable -> IosIcons.SdCard; else -> IosIcons.Phone }, null,
+                                        tint = c.label, modifier = Modifier.size(24.dp),
+                                    )
+                                },
+                                title = l.v.title,
+                                detail = "${Fmt.size(store.freeSpace(l.v.path))} free",
+                                trailing = arrows,
+                            ) { if (!editing) app.push(Route.Folder(l.v.path)) }
+                            // Cloud drives on this phone (Nextcloud, OneDrive, Google Drive…), only when installed.
+                            is Location.Drive -> GroupRow(icon = { CloudIcon(l.d) }, title = l.d.title, trailing = arrows) {
+                                if (!editing) openCloud(ctx, l.d) { app.toast(it) }
+                            }
+                        }
                     }
                     GroupRow(
                         icon = { Icon(IosIcons.Trash, null, tint = c.label, modifier = Modifier.size(24.dp)) },

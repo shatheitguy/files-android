@@ -35,18 +35,26 @@ fun FilesSidebar() {
             item { SidebarRow("Recents", IosIcons.Clock, selected = onTab && app.tab == FilesTab.Recents) { app.selectTab(FilesTab.Recents, keep = false) } }
             item { SidebarRow("Search", IosIcons.Search, selected = onTab && app.tab == FilesTab.Search) { app.selectTab(FilesTab.Search, keep = false) } }
             sidebarSection("loc", "Locations") {
-                volumes.forEachIndexed { i, v ->
-                    val icon = when { v.usb -> IosIcons.Usb; v.removable -> IosIcons.SdCard; else -> IosIcons.Phone }
-                    if (i == 0) {
-                        SidebarRow(v.title, icon, selected = onTab && app.tab == FilesTab.Browse) { app.selectTab(FilesTab.Browse, keep = false) }
-                    } else {
-                        val r = Route.Folder(v.path)
-                        SidebarRow(v.title, icon, selected = side == r) { app.selectSide(r) }
+                val locs = orderedLocations(volumes, clouds)
+                locs.forEachIndexed { i, l ->
+                    val arrows: (@Composable () -> Unit)? = if (editing) ({ MoveArrows(locs, i) }) else null
+                    when (l) {
+                        is Location.Vol -> {
+                            val v = l.v
+                            val icon = when { v.usb -> IosIcons.Usb; v.removable -> IosIcons.SdCard; else -> IosIcons.Phone }
+                            if (v.path == store.root) {
+                                SidebarRow(v.title, icon, selected = onTab && app.tab == FilesTab.Browse, trailing = arrows) {
+                                    if (!editing) app.selectTab(FilesTab.Browse, keep = false)
+                                }
+                            } else {
+                                val r = Route.Folder(v.path)
+                                SidebarRow(v.title, icon, selected = side == r, trailing = arrows) { if (!editing) app.selectSide(r) }
+                            }
+                        }
+                        is Location.Drive -> SidebarRow(l.d.title, leading = { CloudIcon(l.d, 22.dp) }, trailing = arrows) {
+                            if (!editing) openCloud(ctx, l.d) { app.toast(it) }
+                        }
                     }
-                }
-                clouds.forEach { d ->
-                    val r = Route.Cloud(d.authority, d.title)
-                    SidebarRow(d.title, selected = side == r, leading = { CloudIcon(d, 22.dp) }) { app.selectSide(r) }
                 }
                 SidebarRow("Recently Deleted", IosIcons.Trash, selected = side == Route.Trash) { app.selectSide(Route.Trash) }
             }
@@ -101,7 +109,6 @@ fun FilesPane() {
                     s is Route.Tag -> TagScreen(s.tag)
                     s == Route.Trash -> TrashScreen()
                     s is Route.Smb -> SmbScreen(s.serverId, s.path)
-                    s is Route.Cloud -> CloudScreen(s.authority, s.title, s.dirId, s.name)
                     tab == FilesTab.Recents -> RecentsScreen()
                     tab == FilesTab.Search -> SearchScreen()
                     else -> FolderScreen(store.root)

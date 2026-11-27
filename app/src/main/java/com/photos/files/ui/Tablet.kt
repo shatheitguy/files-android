@@ -102,6 +102,7 @@ fun SidebarRow(
     selected: Boolean = false,
     detail: String? = null,
     leading: (@Composable () -> Unit)? = null,
+    trailing: (@Composable () -> Unit)? = null,
     onClick: () -> Unit,
 ) {
     val c = LocalIos.current
@@ -120,7 +121,8 @@ fun SidebarRow(
         }
         Spacer(Modifier.width(8.dp))
         Text(title, fontSize = 17.sp, color = fg, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-        if (detail != null) Text(detail, fontSize = 15.sp, color = if (selected) Color.White.copy(alpha = 0.8f) else c.secondary, maxLines = 1)
+        if (trailing != null) trailing()
+        else if (detail != null) Text(detail, fontSize = 15.sp, color = if (selected) Color.White.copy(alpha = 0.8f) else c.secondary, maxLines = 1)
     }
 }
 
