@@ -83,6 +83,7 @@ private fun Context.findActivity(): Activity? {
 fun BrowseMoreButton(editing: Boolean, onEdit: () -> Unit, onConnect: () -> Unit) {
     val app = LocalApp.current
     val scan = rememberDocumentScanner()
+    val updates = LocalUpdates.current
     var open by remember { mutableStateOf(false) }
     if (editing) {
         GlassPill("Done", color = LocalIos.current.label) { onEdit() }
@@ -97,7 +98,7 @@ fun BrowseMoreButton(editing: Boolean, onEdit: () -> Unit, onConnect: () -> Unit
                 MenuAction("Connect to Server", IosIcons.Phone) { onConnect() },
                 MenuAction("Scan Documents", IosIcons.Doc) { scan() },
                 MenuAction("Settings", IosIcons.Sliders, divider = true) { app.push(Route.Settings()) },
-                MenuAction("Check for Updates", IosIcons.Download) { app.push(Route.Settings()) },
+                MenuAction("Check for Updates", IosIcons.Download) { updates.checkNow("Files") },
             ),
         )
     }
