@@ -44,6 +44,7 @@ class SaveActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         window.isNavigationBarContrastEnforced = false
+        useHighRefreshRate()
         val store = FileStore.get(this)
         val uris = sharedUris()
         val text = intent?.getStringExtra(Intent.EXTRA_TEXT)
@@ -78,6 +79,7 @@ class SaveActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        useHighRefreshRate()
         resumeTick.intValue++
     }
 }

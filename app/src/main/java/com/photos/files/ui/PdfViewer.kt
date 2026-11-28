@@ -278,6 +278,12 @@ fun PdfViewer(startUri: Uri, startPath: String?, onClose: () -> Unit) {
         }
     }
 
+    // Back closes an open sheet, then leaves Markup, and only then closes the PDF.
+    androidx.activity.compose.BackHandler(enabled = sheet != PdfSheet.None || marking) {
+        if (sheet != PdfSheet.None) sheet = PdfSheet.None
+        else if (!saving) { marks.clear(); selected = null; marking = false }
+    }
+
     Box(Modifier.fillMaxSize().background(if (c.dark) Color(0xFF1C1C1E) else Color(0xFFE5E5EA))) {
         val d = doc
         if (d == null) {

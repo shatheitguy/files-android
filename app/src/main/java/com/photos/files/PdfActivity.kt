@@ -17,6 +17,7 @@ class PdfActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         window.isNavigationBarContrastEnforced = false
+        useHighRefreshRate()
         val path = intent?.getStringExtra(ExtraPath)
         val uri = intent?.data ?: path?.let { Uri(it) }
         if (uri == null) { finish(); return }
@@ -33,5 +34,10 @@ class PdfActivity : ComponentActivity() {
             if (ctx !is android.app.Activity) i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             ctx.startActivity(i)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        useHighRefreshRate()
     }
 }
